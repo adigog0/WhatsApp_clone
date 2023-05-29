@@ -6,3 +6,8 @@ export interface IMessageObj{
     delivered:boolean;
 
 }
+
+export interface IReceiverObj{
+    receiverName :string;
+    receiverDp?:File;
+}
