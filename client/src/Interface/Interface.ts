@@ -10,4 +10,13 @@ export interface IMessageObj{
 export interface IReceiverObj{
     receiverName :string;
     receiverDp?:File;
+    receiverChat:string[];
+}
+
+export interface IChatData{
+    id:string;
+    date:string;
+    chat:string;
+    sendTime:string;
+    userName:string;
 }

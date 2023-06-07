@@ -4,15 +4,15 @@ import { useState } from "react";
 import { IReceiverObj } from "../../Interface/Interface";
 
 const LandingPage = () => {
-
-    const [receiver,setReceiver] =useState<IReceiverObj>({
-        receiverName:"",
-        receiverDp:undefined,
+    const [receiver, setReceiver] = useState<IReceiverObj>({
+        receiverName: "",
+        receiverDp: undefined,
+        receiverChat: [],
     });
     return (
         <div className="flex w-full h-full bg-slate-300 gap-3  rounded-lg  p-2">
             <SideBar setReceiver={setReceiver} />
-            <ChatTab receiver={receiver}/>
+            <ChatTab receiver={receiver} />
         </div>
     );
 };

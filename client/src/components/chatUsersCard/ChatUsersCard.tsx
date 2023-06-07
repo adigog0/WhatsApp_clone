@@ -1,35 +1,29 @@
-import { IReceiverObj } from "../../Interface/Interface";
+import { IChatData } from "../../Interface/Interface";
 import Mask from "../../assets/images/Mask.svg";
 
-interface Iprops{
-    userName:string;
-    sendTime:string;
-    date:Date;
-    lastChat:string;
-    setReceiver:React.Dispatch<React.SetStateAction<IReceiverObj>>;
+interface Iprops {
+    selectChatUserHandler: (item: IChatData) => void;
+    chats: IChatData;
+    active: string;
 }
 
-const ChatUsersCard = ({userName,date,lastChat,sendTime,setReceiver}:Iprops) => {
-
-    const selectChatUserHandler =()=>{
-        console.log("clicked")
-        let receiverObj ={
-            receiverName:userName,
-            receiverDp:undefined
-        }
-        setReceiver(receiverObj);
-    }
+const ChatUsersCard = ({ chats, selectChatUserHandler, active }: Iprops) => {
     return (
-        <div onClick={selectChatUserHandler} className="max-h-16 flex min-h-[10%] bg-slate-300 rounded-md p-1 m-1 cursor-pointer overflow-auto">
+        <div
+            onClick={() => selectChatUserHandler(chats)}
+            className={`max-h-16 shadow-sm shadow-slate-400 flex min-h-[10%] ${
+                chats.id === active ? "bg-slate-300" : "bg-slate-50"
+            }  rounded-md p-1 m-1 cursor-pointer overflow-auto hover:bg-slate-300`}
+        >
             <img src={Mask} alt="" />
             <div className=" p-1 flex-auto w-full overflow-auto ">
                 <div className="flex justify-between w-full">
-                    <span className="font-medium">{userName}</span>
-                    <span className="text-sm">{sendTime}</span>
+                    <span className="font-medium">{chats.userName}</span>
+                    <span className="text-sm">{chats.sendTime}</span>
                 </div>
                 <div className="text-sm text-gray-700 w-full  h-fit ">
                     <p className=" whitespace-nowrap w-72 overflow-hidden text-ellipsis">
-                        {lastChat}
+                        {chats.chat}
                     </p>
                 </div>
             </div>

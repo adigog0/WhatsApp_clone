@@ -1,10 +1,11 @@
-import { IMessageObj } from "../../Interface/Interface";
+import { IMessageObj, IReceiverObj } from "../../Interface/Interface";
 
 interface Iprops {
     messages: IMessageObj[];
+    receiver:IReceiverObj;
 }
 
-const ChatRoom = ({ messages }: Iprops) => {
+const ChatRoom = ({ messages,receiver }: Iprops) => {
     console.log(messages);
     return (
         <div className=" flex-auto flex flex-col justify-end overflow-y-auto custom-scrollbar">

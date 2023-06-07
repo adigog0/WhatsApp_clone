@@ -56,7 +56,7 @@ const ChatTab = ({receiver}:Iprops) => {
   return (
     <div className="flex-1 flex flex-col bg-gray-800 rounded-xl">
       <NavBar receiver={receiver} openOptions={openOptions} setOpenOptions={setOpenOptions} />
-      <ChatRoom messages={messages} />
+      <ChatRoom receiver={receiver} messages={messages} />
       <UserInput sendMessageHandler={sendMessageHandler} />
     </div>
   );
