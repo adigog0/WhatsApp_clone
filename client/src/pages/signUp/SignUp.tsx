@@ -1,27 +1,20 @@
 import { useGoogleLogin } from "@react-oauth/google";
 import GoogleIcon from "../../assets/images/GoogleIcon.png";
-import { googleLogIn } from "../../apis/userdata";
+import { googleSignUp } from "../../apis/userdata";
 import { Link } from "react-router-dom";
 import { useSnackbar } from "notistack";
 
-const SignIn = () => {
+const SignUp = () => {
     const { enqueueSnackbar } = useSnackbar();
     const responseMessage = async (response: any) => {
         try {
             let token = response.access_token;
-            const res = await googleLogIn(token);
-            console.log("sign in res",res);
-            localStorage.setItem("token",token);
-            localStorage.setItem("loginUserInfo", JSON.stringify(res.data[0]));
-            enqueueSnackbar("Request Successful!", {
+            await googleSignUp(token);
+            enqueueSnackbar("Successfully Registered.Please SignIn!", {
                 variant: "success",
             });
-            window.location.replace("/whatsAppWeb");
-
-        } catch (err: any) {
-            enqueueSnackbar(`${err.response.status}! ${err.response.data.message}`, {
-                variant: "error",
-            });
+            // window.location.replace("/signIn");
+        } catch (err) {
             console.log("google login error in fe ", err);
         }
     };
@@ -37,7 +30,7 @@ const SignIn = () => {
         <div className="h-screen w-screen bg-slate-50 relative font-sans">
             <div className="bg-white border-slate-300 rounded-2xl absolute w-[25%] h-[70%] border-2 left-[37%] top-[15%] flex flex-col p-8 gap-4">
                 <div className="h-16 font-bold gap-3 flex flex-col items-center justify-center text-slate-700 font-sans ">
-                    <span className="text-4xl">Sign In </span>
+                    <span className="text-4xl">Welcome! </span>
                 </div>
                 <div className="flex flex-col gap-3 text-slate-500">
                     <div className="font-normal text-slate-400 flex justify-center ">
@@ -50,18 +43,39 @@ const SignIn = () => {
                     >
                         <img src={GoogleIcon} alt="" className="h-11" />
                         <span className="text-gray-700 font-medium">
-                            Sign In with google
+                            Sign up with google
                         </span>
                     </button>
+
+                    <div className="mt-3 flex justify-center p-2 font-medium">
+                        or
+                    </div>
                 </div>
 
-                <Link className="cursor-pointer ml-auto mt-auto" to={`/signup`}>
-                    <button className="border-2 rounded-lg hover:bg-slate-300 p-4 text-gray-700 font-medium ">
-                        SignUp
-                    </button>
-                </Link>
+                <form className="flex flex-col gap-4 py-4">
+                    <label
+                        htmlFor="contact"
+                        className="min-w-fit font-sans font-medium text-slate-500 "
+                    >
+                        Phone number:
+                    </label>
+                    <input
+                        type="text"
+                        name="contact"
+                        placeholder="type your number"
+                        className="border-2 p-3 border-slate-300 rounded-2xl"
+                    />
+                    <Link
+                        className="cursor-pointer ml-3"
+                        to={`/signIn`}
+                    >
+                        <button className="border-2 rounded-lg hover:bg-slate-300 p-4 text-gray-700 font-medium ">
+                            SignIn
+                        </button>
+                    </Link>
+                </form>
             </div>
         </div>
     );
 };
-export default SignIn;
+export default SignUp;

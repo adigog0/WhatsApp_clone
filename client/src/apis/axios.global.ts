@@ -7,8 +7,7 @@ let axios = Axios.create({
 });
 
 axios.interceptors.request.use((config) => {
-  let token = localStorage.getItem("access_token");
-  console.log("token in axios.global.ts",token);
+  let token = localStorage.getItem("token");
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }

@@ -1,27 +1,33 @@
-import { IMessageObj, IReceiverObj } from "../../Interface/Interface";
+import { IChats } from "../../Interface/Interface";
+import { extractTime } from "../../utils/time";
 
 interface Iprops {
-    messages: IMessageObj[];
-    receiver:IReceiverObj;
+    chats:IChats[];
+    isLoading?:boolean;
 }
 
-const ChatRoom = ({ messages,receiver }: Iprops) => {
-    console.log(messages);
+const ChatRoom = ({ chats,isLoading }: Iprops) => {
+    const { id } = JSON.parse(
+        localStorage.getItem("loginUserInfo") ?? "null"
+    );
+
+console.log("chats reeceived",chats);
     return (
         <div className=" flex-auto flex flex-col justify-end overflow-y-auto custom-scrollbar">
-            <div className=" h-max max-h-full">
-                {messages.map((item: IMessageObj, i: number) => (
+            {isLoading ? <div className="text-white font-bold m-auto">loading...</div> :<div className=" h-max max-h-full">
+                
+                {chats.map((item: IChats, i: number) => (
                     <div
                         key={i}
                         className={`flex m-3 ${
-                            item.sender === "other"
+                            item.senderid !== id
                                 ? "justify-start"
                                 : "justify-end"
                         }`}
                     >
                         <span
                             className={`flex-col max-w-sm rounded-xl w-max break-all  p-2 ${
-                                item.sender === "other"
+                                item.senderid !== id
                                     ? "rounded-bl-none bg-slate-100"
                                     : "rounded-br-none bg-lime-400"
                             } `}
@@ -30,17 +36,17 @@ const ChatRoom = ({ messages,receiver }: Iprops) => {
 
                             <p
                                 className={`text-xs justify-end text-end ${
-                                    item.sender === "other"
+                                    item.senderid !== id
                                         ? "text-slate-950"
                                         : "text-gray-50 "
                                 } `}
                             >
-                                12:34
+                                {extractTime(item.date)}
                             </p>
                         </span>
                     </div>
                 ))}
-            </div>
+            </div>}
         </div>
     );
 };

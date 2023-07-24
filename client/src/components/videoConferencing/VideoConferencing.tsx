@@ -5,6 +5,8 @@ import VideoOn from "../../assets/icons/videocam_on.svg";
 import VideoOff from "../../assets/icons/videocam_off.svg";
 import CallEnd from "../../assets/icons/callend.svg";
 import { io } from "socket.io-client";
+import AvatarWithName from "../avatarWithName/AvatarWithName";
+import { IlocalStorageData } from "../../Interface/Interface";
 
 const socket = io("http://localhost:3001");
 
@@ -30,8 +32,10 @@ const VideoConferencing = () => {
     const remoteStream = useRef(new MediaStream()); //remote stream
 
     const peer = useRef<RTCPeerConnection>(new RTCPeerConnection(servers));
-    
-    const logInUser = localStorage.get("loginUserInfo") ;
+
+    const { user_email, user_picture, username } = JSON.parse(
+        localStorage.getItem("loginUserInfo") ?? "null"
+    );
 
     const peerConnection = () => {
         localStream
@@ -125,7 +129,7 @@ const VideoConferencing = () => {
     }, []);
 
     useEffect(() => {
-        socket.emit('user',)
+        socket.emit("user");
         socket.on("connection-success", (success) => {
             console.log(success);
         });
@@ -145,15 +149,19 @@ const VideoConferencing = () => {
     }, []);
 
     return (
-        <div className="bg-slate-100 w-screen h-screen p-10 flex flex-col gap-4">
+        <div className="bg-slate-100 w-screen h-screen p-7 flex flex-col gap-4">
             <div className=" bg-black h-5/6 w-full flex gap-6 p-4">
-                <video ref={videoRef} autoPlay muted />
-                <video
-                    className="bg-slate-500"
-                    ref={remoteRef}
-                    autoPlay
-                    muted
-                />
+                <div className="bg-zinc-400 w-[50%]">
+                    <AvatarWithName
+                        avatar={user_picture}
+                        name={username}
+                        email={user_email}
+                    />
+                    <video ref={videoRef} className="width-[100%]" autoPlay muted />
+                </div>
+                <div className="bg-slate-500 flex-1">
+                    <video ref={remoteRef} autoPlay muted />
+                </div>
             </div>
 
             <div className=" p-3 flex gap-4 justify-center">

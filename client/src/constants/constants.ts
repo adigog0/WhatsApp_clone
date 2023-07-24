@@ -35,4 +35,20 @@ export const chatData = [
       userName: 'Joe',
     },
   ];
+
+  // export const MESSAGE_STATUS_TYPE ={
+  //   'PENDING':"PENDING",
+  //   "DELIVERED":"DELIVERED",
+  //   "READ":"READ",
+  //   "SENT":"SENT",
+  //   "FAILURE":"FAILURE",
+  // } as const;
+
+
+  export type MESSAGE_STATUS_TYPE = 'Pending' | 'Delivered' | 'Read' | 'Sent' | 'Failure';
+
+  // type STATUS_TYPE<T> = 
+
+
+
   
