@@ -16,14 +16,14 @@ function Auth(req, res, next) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const token = (_a = req.headers.authorization) === null || _a === void 0 ? void 0 : _a.split(" ")[1];
-            const userInfo = yield (0, user_service_1.decryptUserInfo)(token);
-            if (userInfo === null) {
+            const [result, error] = yield (0, user_service_1.decryptUserInfo)(token !== null && token !== void 0 ? token : "");
+            if (result === null) {
                 res.status(401).json({ message: "Unauthorized Access" });
             }
             else {
-                const id = yield (0, user_service_1.getUserId)(userInfo === null || userInfo === void 0 ? void 0 : userInfo.email);
+                const id = yield (0, user_service_1.getUserId)(result === null || result === void 0 ? void 0 : result.email);
                 const userId = id.id;
-                const user_email = userInfo === null || userInfo === void 0 ? void 0 : userInfo.email;
+                const user_email = result === null || result === void 0 ? void 0 : result.email;
                 const userObj = { userId, user_email };
                 req.user = userObj;
             }
@@ -31,7 +31,7 @@ function Auth(req, res, next) {
         }
         catch (err) {
             console.log("err in Auth", err);
-            res.status(500).json({ message: "Something went wrong" });
+            res.status(500).json({ message: "Error in Auth" });
         }
     });
 }

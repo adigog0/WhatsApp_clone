@@ -9,21 +9,13 @@ export interface IMessageObj {
     status_type: MESSAGE_STATUS_TYPE;
 }
 
-// export interface IChatUserObj {
-//     userId: string;
-//     userName: string;
-//     user_email:string;
-//     user_picture: string | undefined;
-//     user_chats: string[];
-// }
-
 export interface IUsers {
-    display_id: string;
-    display_email: string;
-    display_name: string;
-    display_picture: string | undefined;
-    message:string;
-    date:string;
+    user_id: string;
+    user_email: string;
+    user_name: string;
+    user_picture: string | undefined;
+    message?:string;
+    date?:string | Date;
 }
 
 export interface IChatData {
@@ -36,8 +28,8 @@ export interface IChatData {
 
 export interface IChats{
     messageid?:string;
-    senderid:string;
-    receipentid:string;
+    senderid:string | number;
+    receipentid:string | number;
     status_type:MESSAGE_STATUS_TYPE;
     message:string;
     date:string | Date;

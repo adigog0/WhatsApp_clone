@@ -11,27 +11,25 @@ const ChatRoom = ({ chats,isLoading }: Iprops) => {
         localStorage.getItem("loginUserInfo") ?? "null"
     );
 
-console.log("chats reeceived",chats);
     return (
         <div className=" flex-auto flex flex-col justify-end overflow-y-auto custom-scrollbar">
-            {isLoading ? <div className="text-white font-bold m-auto">loading...</div> :<div className=" h-max max-h-full">
+            {isLoading ? <div className="text-white font-bold m-auto">loading...</div> :
+            <div className=" h-max max-h-full">
                 
                 {chats.map((item: IChats, i: number) => (
                     <div
                         key={i}
-                        className={`flex m-3 ${
-                            item.senderid !== id
-                                ? "justify-start"
-                                : "justify-end"
-                        }`}
+                        className={`flex m-3 ${item.senderid === id ?"justify-end": "justify-start"}`}
                     >
+                        
                         <span
                             className={`flex-col max-w-sm rounded-xl w-max break-all  p-2 ${
-                                item.senderid !== id
-                                    ? "rounded-bl-none bg-slate-100"
-                                    : "rounded-br-none bg-lime-400"
-                            } `}
+                                item.senderid === id
+                                    ? "rounded-br-none bg-lime-400"
+                                    : "rounded-bl-none bg-slate-100"
+                            }`}
                         >
+                            
                             {item.message}
 
                             <p

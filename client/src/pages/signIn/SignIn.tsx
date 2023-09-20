@@ -4,15 +4,15 @@ import { googleLogIn } from "../../apis/userdata";
 import { Link } from "react-router-dom";
 import { useSnackbar } from "notistack";
 
+
 const SignIn = () => {
     const { enqueueSnackbar } = useSnackbar();
     const responseMessage = async (response: any) => {
         try {
             let token = response.access_token;
             const res = await googleLogIn(token);
-            console.log("sign in res",res);
             localStorage.setItem("token",token);
-            localStorage.setItem("loginUserInfo", JSON.stringify(res.data[0]));
+            localStorage.setItem("loginUserInfo", JSON.stringify(res.data));
             enqueueSnackbar("Request Successful!", {
                 variant: "success",
             });
@@ -22,7 +22,6 @@ const SignIn = () => {
             enqueueSnackbar(`${err.response.status}! ${err.response.data.message}`, {
                 variant: "error",
             });
-            console.log("google login error in fe ", err);
         }
     };
     const errorMessage = (error: any) => {

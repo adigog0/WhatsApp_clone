@@ -41,9 +41,9 @@ const express_1 = __importDefault(require("express"));
 const http = __importStar(require("http"));
 const socket_io_1 = require("socket.io");
 const cors_1 = __importDefault(require("cors"));
-const db_1 = __importDefault(require("./db"));
 const Auth_1 = require("./middleware/Auth");
 const user_service_1 = require("./services/user.service");
+const controller_1 = require("./controller/controller");
 const app = (0, express_1.default)();
 app.use((0, cors_1.default)());
 app.use(express_1.default.json()); //middleware for parsing
@@ -58,74 +58,38 @@ const io = new socket_io_1.Server(server, {
 const users = new Map();
 io.on("connection", (socket) => {
     socket.on("connected-user", (userId) => {
+        console.log("user connected", userId, socket.id);
         users.set(userId, socket.id);
     });
     socket.on("join_room", (data) => {
         socket.join(data);
     });
     //for chatting
-    socket.on("send_message", (data) => {
-        (0, user_service_1.sendMessage)(data);
-        console.log("sender message", data);
-        const receipent = users.get(data.receipentid);
+    socket.on("send_message", (data) => __awaiter(void 0, void 0, void 0, function* () {
+        const response = yield (0, user_service_1.sendMessage)(data);
+        console.log("response from bk after insert", response);
+        const receipent = users.get(response.receipentid);
+        console.log("receipent", receipent);
         socket.broadcast.to(receipent !== null && receipent !== void 0 ? receipent : "").emit("receive_message", {
-            date: data.date,
-            status_type: "Send",
-            message: data.message,
-            senderid: data.senderid,
-            receipentid: data.receipentid,
+            date: response.date,
+            status_type: "Sent",
+            message: response.message,
+            senderid: response.senderid,
+            receipentid: response.receipentid,
+            messageid: response.messageid
         });
-    });
+    }));
     //disconnect the connected users
     socket.on("disconnect", () => {
         socket.broadcast.emit("callEnded");
     });
 });
-app.post("/google-sign-up", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { token } = req.body;
-    try {
-        const ticket = yield (0, user_service_1.decryptUserInfo)(token);
-        if (ticket) {
-            const { name, email, picture } = ticket;
-            const setuser = yield db_1.default.query(`INSERT INTO public."User"
-            (username, user_email, user_picture)
-            VALUES('${name}', '${email}', '${picture}') RETURNING *`);
-            res.status(201).json(setuser.rows);
-        }
-    }
-    catch (err) {
-        console.log("error in google Signup ", err);
-    }
-}));
-app.post("/google/sign-in", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { token } = req.body;
-    try {
-        const ticket = yield (0, user_service_1.decryptUserInfo)(token);
-        if (ticket) {
-            const { email } = ticket;
-            const emailCheckQuery = yield db_1.default.query(` select * from public.
-              "User" where user_email = $1 `, [email]);
-            if (emailCheckQuery.rowCount === 0) {
-                res.status(404).json({ message: "Please Sign Up!" });
-            }
-            else {
-                res.status(201).json(emailCheckQuery.rows);
-            }
-        }
-    }
-    catch (err) {
-        console.log("error in google signin", err);
-    }
-}));
-app.get("/chats", Auth_1.Auth, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log("GET ALL CHATS FOR", req.user);
-    const userChats = yield (0, user_service_1.getUserChats)(req.user.userId);
-    res.status(200).json(userChats.rows);
-}));
-app.get("/user-messages/:id", Auth_1.Auth, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const userMessage = yield (0, user_service_1.getUserMessages)(req.user.userId, req.params.id);
-    res.status(200).json(userMessage.rows);
-}));
+app.post("/google-sign-up", controller_1.googleSignUp);
+app.post("/google/sign-in", controller_1.googleSignIn);
+app.get("/chats", Auth_1.Auth, controller_1.getUserAllChats);
+app.get("/user-messages/:id", Auth_1.Auth, controller_1.getUserMessageById);
+app.get("/user-list", Auth_1.Auth, controller_1.getContactList);
+app.patch("/update-message-status/:messageId", Auth_1.Auth, controller_1.updateStatusByMessageId);
 app.get("/health", (req, res) => {
     res.status(200).json({ message: "server is running" });
 });

@@ -1,1 +1,1 @@
-export type MESSAGE_STATUS_TYPE = 'PENDING' | 'DELIVERED' | 'READ' | 'SENT' | 'FAILURE';
+export type MESSAGE_STATUS_TYPE = 'Pending' | 'Delivered' | 'Read' | 'Sent' | 'Failure';

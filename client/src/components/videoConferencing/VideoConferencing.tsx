@@ -48,7 +48,6 @@ const VideoConferencing = () => {
                 .forEach((track) => remoteStream.current?.addTrack(track));
         };
         peer.current.onicecandidate = (e) => {
-            console.log("onicecandidate", e);
             socket.emit("candidate", e.candidate);
         };
     };
@@ -89,7 +88,6 @@ const VideoConferencing = () => {
             audio.enabled = true;
             setMicOn(true);
         }
-        console.log("audio", audio);
     }
 
     function toggleVideoCam() {
@@ -131,7 +129,7 @@ const VideoConferencing = () => {
     useEffect(() => {
         socket.emit("user");
         socket.on("connection-success", (success) => {
-            console.log(success);
+           
         });
 
         socket.on("sdp", (data) => {
@@ -139,7 +137,6 @@ const VideoConferencing = () => {
         });
 
         socket.on("candidate", (candidates) => {
-            console.log("candidate", candidates);
             addCandidate(candidates);
         });
 

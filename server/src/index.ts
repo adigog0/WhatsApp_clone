@@ -7,7 +7,8 @@ import { Server } from "socket.io";
 import cors from "cors";
 import pool from "./db";
 import { Auth } from "./middleware/Auth";
-import { decryptUserInfo, getUserChats, getUserMessages, sendMessage } from "./services/user.service";
+import { decryptUserInfo, getAllUsers, getUserChats, getUserMessages, sendMessage } from "./services/user.service";
+import { getContactList, getUserAllChats, getUserMessageById, googleSignIn, googleSignUp, updateStatusByMessageId } from './controller/controller';
 
 
 const app = express();
@@ -24,10 +25,11 @@ const io = new Server(server, {
 });
 
 // users map to keep track of users
-const users = new Map<number, string>();
+const users = new Map<number|string, string>();
 
 io.on("connection", (socket) => {
-    socket.on("connected-user", (userId: number) => {
+    socket.on("connected-user", (userId: number | string) => {
+        console.log("user connected",userId,socket.id)
         users.set(userId, socket.id);
     });
 
@@ -36,76 +38,39 @@ io.on("connection", (socket) => {
     });
 
     //for chatting
-    socket.on("send_message", (data: ISenderData) => {
-        sendMessage(data);
-        console.log("sender message", data);
-        const receipent = users.get(data.receipentid);
+    socket.on("send_message", async(data: ISenderData) => {
+        const response = await sendMessage(data);
+        console.log("response from bk after insert",response)
+        const receipent = users.get(response.receipentid);
+        console.log("receipent",receipent);
 
         socket.broadcast.to(receipent ?? "").emit("receive_message", {
-            date: data.date,
-            status_type: "Send",
-            message: data.message,
-            senderid: data.senderid,
-            receipentid: data.receipentid,
+            date: response.date,
+            status_type: "Sent",
+            message: response.message,
+            senderid: response.senderid,
+            receipentid: response.receipentid,
+            messageid:response.messageid
         });
     });
 
     //disconnect the connected users
     socket.on("disconnect", () => {
         socket.broadcast.emit("callEnded");
-    });
+    }); 
 });
 
-app.post("/google-sign-up", async (req, res) => {
-    const { token } = req.body;
-    try {
-        const ticket = await decryptUserInfo(token);
-        if (ticket) {
-            const { name, email, picture } = ticket;
-            const setuser = await pool.query(`INSERT INTO public."User"
-            (username, user_email, user_picture)
-            VALUES('${name}', '${email}', '${picture}') RETURNING *`);
+app.post("/google-sign-up",googleSignUp);
 
-            res.status(201).json(setuser.rows);
-        }
-    } catch (err: any) {
-        console.log("error in google Signup ", err);
-    }
-});
+app.post("/google/sign-in", googleSignIn);
 
-app.post("/google/sign-in", async (req, res) => {
-    const { token } = req.body;
-    try {
-        const ticket = await decryptUserInfo(token);
-        if (ticket) {
-            const { email } = ticket;
-            const emailCheckQuery = await pool.query(
-                ` select * from public.
-              "User" where user_email = $1 `,
-                [email]
-            );
+app.get("/chats", Auth,getUserAllChats);
 
-            if (emailCheckQuery.rowCount === 0) {
-                res.status(404).json({ message: "Please Sign Up!" });
-            } else {
-                res.status(201).json(emailCheckQuery.rows);
-            }
-        }
-    } catch (err) {
-        console.log("error in google signin", err);
-    }
-});
+app.get("/user-messages/:id", Auth,getUserMessageById );
 
-app.get("/chats", Auth, async (req, res) => {
-    console.log("GET ALL CHATS FOR",req.user);
-    const userChats = await getUserChats(req.user.userId);
-    res.status(200).json(userChats.rows);
-});
+app.get("/user-list",Auth,getContactList)
 
-app.get("/user-messages/:id", Auth, async(req, res) => {
-    const userMessage = await getUserMessages(req.user.userId ,req.params.id );
-    res.status(200).json(userMessage.rows);
-});
+app.patch("/update-message-status/:messageId",Auth,updateStatusByMessageId);
 
 app.get("/health", (req, res) => {
     res.status(200).json({ message: "server is running" });

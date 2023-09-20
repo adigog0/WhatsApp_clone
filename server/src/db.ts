@@ -1,4 +1,6 @@
-const Pool = require("pg").Pool;
+import { Pool } from 'pg';
+
+// const Pool = require("pg").Pool;
 const conString = process.env.DATABASE_URL;
 
 const pool = new Pool({

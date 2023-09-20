@@ -18,14 +18,14 @@ declare global {
 export async function Auth(req: Request, res: Response, next: NextFunction) {
     try {
         const token = req.headers.authorization?.split(" ")[1];
-        const userInfo = await decryptUserInfo(token);
-        if (userInfo === null) {
+        const [result,error] = await decryptUserInfo(token ?? "");
+        if (result === null) {
             res.status(401).json({ message: "Unauthorized Access" });
         }
         else {
-            const id = await getUserId(userInfo?.email);
+            const id = await getUserId(result?.email);
             const userId = id.id;
-            const user_email = userInfo?.email;
+            const user_email = result?.email;
 
             const userObj = { userId, user_email };
             req.user = userObj;
@@ -34,6 +34,6 @@ export async function Auth(req: Request, res: Response, next: NextFunction) {
         next();
     } catch (err: any) {
         console.log("err in Auth", err);
-        res.status(500).json({ message: "Something went wrong" });
+        res.status(500).json({ message: "Error in Auth" });
     }
 }
